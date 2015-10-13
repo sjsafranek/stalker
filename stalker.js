@@ -21,16 +21,18 @@ var log = bunyan.createLogger({
     streams: [
         {
             level: "info",
-            stream: process.stdout
+            path: "crawler.log"//,
+            //stream: process.stdout
         },
         {
             level: "error",
-            //path: "error.log"
-            stream: process.stdout
+            path: "crawler.log"//,
+            //stream: process.stdout
         },
         {
             level: "warn",
-            stream: process.stdout
+            path: "crawler.log"//,
+            //stream: process.stdout
         },
     ]
 });
@@ -63,7 +65,7 @@ searchTerm = searchTerm.substring(0, searchTerm.length - 1);
  * @param   {Page} page object for js-crawler
  */
 function harvest(content) {
-    log.info('harvest page');
+    log.info('harvest page',{search: searchTerm});
     var words = searchTerm.split('+');
     for (var i = 0; i < words.length; i++){
         if (content.indexOf(words[i]) == -1){
@@ -134,7 +136,7 @@ new Crawler()
     .configure({
         shouldCrawl: function(url) {
             var p = url.indexOf('http://play.google.com/');
-            var y = url.indexOf('http://youtube.com/');
+            var y = url.indexOf('://youtube.com/');
             return p == -1 || y == -1;
         },
         depth: 2, 
@@ -151,7 +153,7 @@ new Crawler()
                 if (page.url.indexOf('related:http') == -1 && 
                     page.url.indexOf('http://webcache.googleusercontent.com/') == -1 &&
                     page.url.indexOf('google.com/') == -1 &&
-                    page.url.indexOf('http://www.youtube.com/')
+                    page.url.indexOf('://www.youtube.com/') == -1
                     ){
                     searchResultUrls.push(page.url);
                 }
@@ -162,19 +164,19 @@ new Crawler()
                 if ('q' in query){
                     if (query.q.indexOf('http') != -1){
                         if (isMatchedURL(query.q)){
-                            log.info('valid url found', {url:query.q});
+                            log.info('valid url found', {url:query.q, search:searchTerm});
                             searchResultUrls.push(query.q);
                         }
                     }
                 }
             }
             catch(err){
-                log.error('error with url parsing',{error: err});
+                log.error('error with url parsing',{error: err, search:searchTerm});
             }
-            log.info('success',{url: page.url, status: page.status, content: page.content.length});
+            log.info('success',{url: page.url, status: page.status, content: page.content.length, search: searchTerm});
         },
         failure: function(page) {
-            log.warn('error with request', {url: page.url, status: page.status, content: page.error});
+            log.warn('error with request', {url: page.url, status: page.status, content: page.error, search: searchTerm});
         },
         finished: function(crawledUrls) {
             console.log('Completed');
