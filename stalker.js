@@ -95,7 +95,12 @@ function isMatchedURL(url) {
     var socialMediaServices = [
         'https://www.facebook.com/',
         'https://twitter.com/',
-        'https://www.linkedin.com/'
+        'https://www.linkedin.com/',
+        'https://instagram.com/',
+        'https://www.tumblr.com/',
+        'https://www.pinterest.com/',
+        'https://plus.google.com/'
+
     ];
     for (var i = 0; i < socialMediaServices.length; i++){
         if (url.indexOf(socialMediaServices[i]) != -1){
@@ -104,7 +109,7 @@ function isMatchedURL(url) {
     }
     var words = searchTerm.split('+');
     for (var i = 0; i < words.length; i++){
-        if (hostname.indexOf(words[i]) != -1){
+        if (url.indexOf(words[i]) != -1){
             return true;
         }
     }
@@ -134,8 +139,8 @@ new Crawler()
         depth: 2, 
         //maxRequestsPerSecond: 100,
         //maxConcurrentRequests: 10
-        maxRequestsPerSecond: 2,
-        maxConcurrentRequests: 2,
+        maxRequestsPerSecond: 10,
+        maxConcurrentRequests: 4,
         userAgent: 'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.6; en-US; rv:1.9.2) Gecko/20100115 Firefox/3.6',
     })
     .crawl({
