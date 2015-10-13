@@ -62,18 +62,19 @@ searchTerm = searchTerm.substring(0, searchTerm.length - 1);
  * @method  harvest
  * @param   {Page} page object for js-crawler
  */
-function harvest(page) {
+function harvest(content) {
     log.info('harvest page');
-    if (page.content.indexOf('Candidate') != -1 && page.content.indexOf('Party') != -1){
-        console.log('FOUND ' + page.url);
+    var words = searchTerm.split('+');
+    for (var i = 0; i < words.length; i++){
+        if (content.indexOf(words[i]) == -1){
+            return false
+        }
     }
-    else if(page.content.indexOf('candidate') != -1 && page.content.indexOf('party') != -1){
-        console.log('FOUND ' + page.url);
-    }
-    var $ = cheerio.load(page);
-    $('div.row.candidate-row').each(function(i,e){
-        console.log($(e).text());
-    });
+    var $ = cheerio.load(content);
+    //$('div.row.candidate-row').each(function(i,e){
+    //    console.log($(e).text());
+    //});
+    return true;
 }
 
 
@@ -146,6 +147,16 @@ new Crawler()
     .crawl({
         url: 'https://www.google.com/search?q=' + searchTerm,
         success: function(page) {
+            if(harvest(page.content)){
+                if (page.url.indexOf('related:http') == -1 && 
+                    page.url.indexOf('http://webcache.googleusercontent.com/') == -1 &&
+                    page.url.indexOf('google.com/') == -1 &&
+                    page.url.indexOf('http://www.youtube.com/')
+                    ){
+                    searchResultUrls.push(page.url);
+                }
+                //searchResultUrls.push(page.url);
+            };
             try {
                 var query = URL.parse(page.url, true).query;
                 if ('q' in query){
